@@ -36,9 +36,6 @@ Vue.component('product', {
                 <ul>
                     <li v-for="size in sizes">{{ size }}</li>
                 </ul>
-                <div class="cart">
-                    <p>Cart({{ cart }})</p>
-                </div>
                 <button
                     @click="addToCart"
                     :disabled="!inStock"
@@ -77,22 +74,20 @@ Vue.component('product', {
                     variantId: 2235,
                     variantColor: 'blue',
                     variantImage: "./assets/vmSocks-blue-onWhite.jpg",
-                    variantQuantity: 0
+                    variantQuantity: 3
                 }
             ],
             sizes: ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
-            cart: 0,
         }
     },
     methods: {
         addToCart() {
-            this.cart += 1
+            this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId);
         },
 
+
         deleteFromCart() {
-            if (this.cart != 0) {
-                this.cart -= 1
-            }
+            this.$emit('delete-from-cart', this.variants[this.selectedVariant].variantId);
         },
 
         updateProduct(index) {
@@ -151,7 +146,18 @@ Vue.component('product-details', {
 let app = new Vue({
     el: '#app',
     data: {
-        premium: true
+        premium: true,
+        cart: []
+    },
+    methods: {
+        updateCart(id) {
+            this.cart.push(id);
+        },
+        deleteFromCart(id) {
+            if (this.cart.length != 0 && this.cart.includes(id)) {
+                this.cart.splice(this.cart.indexOf(id), 1);
+            }
+        },
     }
 })
 
