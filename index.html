@@ -1,67 +1,21 @@
 <!doctype html>
 <html lang="ru">
+
 <head>
-   <meta charset="UTF-8">
-   <meta name="viewport"
-         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-   <script defer src="js/vue.js"></script>
-   <script defer src="js/main.js"></script>
-   <link rel="stylesheet" href="css/main.css">
-   <title>Product App</title>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script defer src="js/vue.js"></script>
+    <script defer src="js/main.js"></script>
+    <link rel="stylesheet" href="css/main.css">
+    <title>Product App</title>
 </head>
+
 <body>
-<div id="app">
-    
-    <div class="product">
-
-        <div class="product-image">
-            <img :src="image" :alt="altText">
-        </div>
-
-        <div class="product-info">
-            <h1>{{ title }}</h1>
-            <p>{{ description }}</p>
-            <a :href="link">More products like this</a>
-
-            <p v-if="inStock">In stock</p>
-            <p v-else style="text-decoration: line-through;">Out of Stock</p>
-
-            <span v-show="onSale">On Sale</span>
-            <p>{{sale}}</p>
-            <ul>
-                <li v-for="detail in details">{{ detail }}</li>
-            </ul>
-            <div
-                class="color-box" 
-                v-for="(variant, index) in variants"
-                :key="variant.variantId"
-                :style="{ backgroundColor:variant.variantColor }"
-                @mouseover="updateProduct(index)"
-                >
-            </div>
-            <ul>
-                <li v-for="size in sizes">{{ size }}</li>
-            </ul>
-            <div class="cart">
-                <p>Cart({{ cart }})</p>
-            </div>
-            <button
-                @click="addToCart"
-                :disabled="!inStock"
-                :class="{ disabledButton: !inStock }"
-            >
-                Add to cart
-            </button>
-            <button
-                @click="deleteFromCart"
-                :disabled="!inStock"
-                :class="{ disabledButton: !inStock }"
-            >
-                Delete from cart
-            </button>        
-        </div>
-   </div>
-</div>
+    <div id="app">
+        <product :premium="premium"></product>
+    </div>
 </body>
+
 </html>
