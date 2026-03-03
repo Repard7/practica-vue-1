@@ -1,4 +1,11 @@
+let eventBus = new Vue()
+
 Vue.component('product', {
+    mounted() {
+        eventBus.$on('review-submitted', productReview => {
+            this.reviews.push(productReview)
+        })
+    },
     props: {
         premium: {
             type: Boolean,
@@ -15,10 +22,7 @@ Vue.component('product', {
             <div class="product-info">
                 <h1>{{ title }}</h1>
                 <p>{{ description }}</p>
-                <p>Shipping: {{ shipping }}</p>
                 <a :href="link">More products like this</a>
-
-                <product-details :details="details"></product-details>
 
                 <p v-if="inStock">In stock</p>
                 <p v-else style="text-decoration: line-through;">Out of Stock</p>
@@ -50,19 +54,8 @@ Vue.component('product', {
                 >
                     Delete from cart
                 </button>
-                <div>
-                    <h2>Reviews</h2>
-                    <p v-if="!reviews.length">There are no reviews yet.</p>
-                    <ul>
-                        <li v-for="review in reviews">
-                            <p>{{ review.name }}</p>
-                            <p>Rating: {{ review.rating }}</p>
-                            <p>{{ review.review }}</p>
-                            <p>Recomended? {{ review.recommendation }}</p>
-                        </li>
-                    </ul>
-                </div>
-                <product-review @review-submitted="addReview"></product-review>
+                <product-tabs :reviews="reviews" :shipping="shipping" :details="details"></product-tabs>
+                
             </div>
         </div>
     `,
@@ -109,10 +102,6 @@ Vue.component('product', {
             console.log(index);
         },
 
-        addReview(productReview) {
-            this.reviews.push(productReview)
-        }
-
     },
     computed: {
         title() {
@@ -146,6 +135,7 @@ Vue.component('product', {
         }
 
     }
+
 })
 
 Vue.component('product-details', {
@@ -231,7 +221,7 @@ Vue.component('product-review', {
                     rating: this.rating,
                     recommendation: this.recommendation
                 }
-                this.$emit('review-submitted', productReview)
+                eventBus.$emit('review-submitted', productReview)
                 this.name = null
                 this.review = null
                 this.rating = null
@@ -243,9 +233,63 @@ Vue.component('product-review', {
                 if (!this.recommendation) this.errors.push("Recommendation required.")
             }
         }
-
     }
 })
+
+Vue.component('product-tabs', {
+    props: {
+        reviews: {
+            type: Array,
+            required: false
+        },
+        shipping: {
+            type: [String, Number],
+            required: false
+        },
+        details: {
+            type: Array,
+            required: true
+        }
+    },
+    template: `
+        <div>   
+            <ul>
+                <span class="tab"
+                    v-for="(tab, index) in tabs"
+                    @click="selectedTab = tab"
+                    :class="{ activeTab: selectedTab === tab }"
+                >{{ tab }}</span>
+            </ul>
+            <div v-show="selectedTab === 'Reviews'">
+                <p v-if="!reviews.length">There are no reviews yet.</p>
+                <ul>
+                    <li v-for="review in reviews">
+                        <p>{{ review.name }}</p>
+                        <p>Rating: {{ review.rating }}</p>
+                        <p>{{ review.review }}</p>
+                        <p>Recomended? {{ review.recommendation }}</p>
+                    </li>
+                </ul>
+            </div>
+            <div v-show="selectedTab === 'Make a Review'">
+                <product-review></product-review>
+            </div>
+            <div v-show="selectedTab === 'Shipping'">
+                <p>Shipping: {{ shipping }}</p>
+            </div>
+            <div v-show="selectedTab === 'Details'">
+                <product-details :details="details"></product-details>
+            </div>
+        </div>
+    `,
+    data() {
+        return {
+            tabs: ['Reviews', 'Make a Review', 'Shipping', 'Details'],
+            selectedTab: 'Reviews'
+        }
+    }
+})
+
 
 let app = new Vue({
     el: '#app',
