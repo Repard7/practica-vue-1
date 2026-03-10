@@ -10,6 +10,15 @@ Vue.component('product', {
         premium: {
             type: Boolean,
             required: true
+        },
+        cart: {
+            type: Array,
+            required: true
+        },
+
+        cartDetailsVisible: {
+            type: Boolean,
+            required: true
         }
     },
     template: `
@@ -18,7 +27,6 @@ Vue.component('product', {
             <div class="product-image">
                 <img :src="image" :alt="altText">
             </div>
-
             <div class="product-info">
                 <h1>{{ title }}</h1>
                 <p>{{ description }}</p>
@@ -55,7 +63,10 @@ Vue.component('product', {
                     Delete from cart
                 </button>
                 <product-tabs :reviews="reviews" :shipping="shipping" :details="details"></product-tabs>
-                
+                <div v-if="cartDetailsVisible" class="modal-overlay" @click="$emit('close-cart-details')"></div>
+                <cart-details v-if="cartDetailsVisible" :cart="cart" :variants="variants"
+                    :shipping="shipping" :brand="brand" :product="product" class="modal-cart"
+                ></cart-details>
             </div>
         </div>
     `,
@@ -290,11 +301,34 @@ Vue.component('product-tabs', {
     }
 })
 
+Vue.component('cart-details', {
+    props: {
+        cart: Array,
+        variants: Array,
+        shipping: [String, Number],
+        brand: String,
+        product: String
+    },
+    template: `
+        <div class="cart-details" v-if="cart && cart.length && variants">
+            <ul>
+                <li v-for="productId in cart" :key="productId">
+                    <p>{{brand}} {{product}}</p>
+                    <p>Стоимость доставки: {{shipping}}</p>
+                    <div v-for="variant in variants" :key="variant.variantId" v-if="variant.variantId == productId">
+                        <img :src="variant.variantImage">               
+                    </div>
+                </li>
+            </ul>
+        </div>
+    `
+});
 
 let app = new Vue({
     el: '#app',
     data: {
         premium: true,
+        cartDetailsVisible: false,
         cart: []
     },
     methods: {
@@ -306,6 +340,12 @@ let app = new Vue({
                 this.cart.splice(this.cart.indexOf(id), 1);
             }
         },
+        toggleCartDetails() {
+            this.cartDetailsVisible = !this.cartDetailsVisible;
+        },
+        closeCartDetails() {
+            this.cartDetailsVisible = false;
+        }
     }
 })
 
