@@ -183,7 +183,7 @@ Vue.component('product-review', {
         </select>
     </p>
 
-    <p>
+    <div v-if="rating && rating > 3">
         Would you recommend this product?
         <div>
             <label for="option1">yes</label> 
@@ -193,7 +193,7 @@ Vue.component('product-review', {
             <label for="option2">no</label> 
             <input id="option2" type="radio" value="no" v-model="recommendation">
         </div>
-    </p>
+    </div>
 
     <p>
         <input type="submit" value="Submit"> 
@@ -214,7 +214,7 @@ Vue.component('product-review', {
     methods: {
         onSubmit() {
             this.errors = []
-            if (this.name && this.review && this.rating && this.recommendation) {
+            if (this.name && this.review && this.rating && (this.rating <= 3 || this.recommendation)) {
                 let productReview = {
                     name: this.name,
                     review: this.review,
@@ -230,7 +230,7 @@ Vue.component('product-review', {
                 if (!this.name) this.errors.push("Name required.")
                 if (!this.review) this.errors.push("Review required.")
                 if (!this.rating) this.errors.push("Rating required.")
-                if (!this.recommendation) this.errors.push("Recommendation required.")
+                if (!this.recommendation && this.rating > 3) this.errors.push("Recommendation required.")
             }
         }
     }
@@ -267,7 +267,7 @@ Vue.component('product-tabs', {
                         <p>{{ review.name }}</p>
                         <p>Rating: {{ review.rating }}</p>
                         <p>{{ review.review }}</p>
-                        <p>Recomended? {{ review.recommendation }}</p>
+                        <p v-show="review.recommendation">Recomended? {{ review.recommendation }}</p>
                     </li>
                 </ul>
             </div>
